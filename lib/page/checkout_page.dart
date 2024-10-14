@@ -5,20 +5,21 @@ class CheckOutPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Recuperando os argumentos passados pela navegação
     final args =
-        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-    final String reservationNumber = args['reservationNumber'];
-    final String guestName = args['guestName'];
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
 
-    double totalAmount = 0.0; // Total a ser pago
+    final String reservationNumber = args?['reservationNumber'] ?? '00000';
+    final String guestName = args?['guestName'] ?? 'Nome Padrão';
+
+    double totalAmount = 0.0;
     List<Map<String, dynamic>> consumptions = [
       {'item': 'Refeição', 'price': 50.0},
       {'item': 'Mini-bar', 'price': 30.0},
       {'item': 'Serviço de quarto', 'price': 20.0},
+      {'item': 'Spa', 'price': 100.0},
+      {'item': 'Lavanderia', 'price': 40.0},
     ];
 
-    // Calcula o total
     totalAmount = consumptions.fold(0, (sum, item) => sum + item['price']);
 
     return Scaffold(
@@ -53,81 +54,153 @@ class CheckOutPage extends StatelessWidget {
           ),
         ),
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0xFF00b4d8),
-              Color(0xFF90e0ef),
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Dados da Reserva',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            const SizedBox(height: 10.0),
-            Text(
-              'Número da Reserva: $reservationNumber',
-              style: const TextStyle(
-                  fontSize: 16.0, color: Colors.white), // Cor do texto
-            ),
-            Text(
-              'Nome do Hóspede: $guestName',
-              style: const TextStyle(
-                  fontSize: 16.0, color: Colors.white), // Cor do texto
-            ),
-            const SizedBox(height: 20.0),
-            Text(
-              'Consumos:',
-              style: Theme.of(context)
-                  .textTheme
-                  .headlineMedium
-                  ?.copyWith(color: Colors.white), 
-            ),
-            const SizedBox(height: 10.0),
-            Expanded(
-              child: ListView.builder(
-                itemCount: consumptions.length,
-                itemBuilder: (context, index) {
-                  final consumption = consumptions[index];
-                  return ListTile(
-                    title: Text(consumption['item'],
-                        style: const TextStyle(
-                            color: Colors.white)),
-                    trailing: Text(
-                      'R\$ ${consumption['price'].toStringAsFixed(2)}',
-                      style:
-                          const TextStyle(color: Colors.white), 
+      body: Column(
+        children: [
+          Expanded(
+            child: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Color(0xFF00b4d8),
+                    Color(0xFF90e0ef),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Text(
+                      'Dados da Reserva',
+                      style: Theme.of(context).textTheme.headlineMedium,
                     ),
-                  );
-                },
+                  ),
+                  const SizedBox(height: 10.0),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12.0),
+                    margin: const EdgeInsets.only(bottom: 10.0),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.8),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Número da Reserva: $reservationNumber',
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                        ),
+                        Text(
+                          'Nome do Hóspede: $guestName',
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Colors.black,
+                                  ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20.0),
+                  Center(
+                    child: Text(
+                      'Consumos:',
+                      style: Theme.of(context).textTheme.headlineMedium,
+                    ),
+                  ),
+                  const SizedBox(height: 10.0),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: consumptions.length,
+                      itemBuilder: (context, index) {
+                        final consumption = consumptions[index];
+                        return Card(
+                          elevation: 4,
+                          margin: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: ListTile(
+                            leading: const Icon(
+                              Icons.receipt,
+                              color: Color(0xFF0096c7),
+                            ),
+                            title: Text(
+                              consumption['item'],
+                              style: const TextStyle(color: Colors.black),
+                            ),
+                            trailing: Text(
+                              'R\$ ${consumption['price'].toStringAsFixed(2)}',
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15.0,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 10.0),
-            Text(
-              'Total: R\$ ${totalAmount.toStringAsFixed(2)}',
-              style: const TextStyle(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white), 
+          ),
+          Container(
+            padding: const EdgeInsets.all(16.0),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 10,
+                  offset: Offset(0, -2),
+                ),
+              ],
             ),
-            const SizedBox(height: 20.0),
-            ElevatedButton(
-              onPressed: () {
-                // Implementar lógica de pagamento
-                _showConfirmationDialog(context);
-              },
-              child: const Text('Finalizar Check-Out'),
+            child: Column(
+              children: [
+                Text(
+                  'Total: R\$ ${totalAmount.toStringAsFixed(2)}',
+                  style: const TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black),
+                ),
+                const SizedBox(height: 10.0),
+                Center(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 30.0, vertical: 15.0),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                    onPressed: () {
+                      _showConfirmationDialog(context);
+                    },
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Icon(Icons.check_circle, size: 20),
+                        SizedBox(width: 8), 
+                        Text(
+                          'Finalizar Check-Out',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -137,22 +210,53 @@ class CheckOutPage extends StatelessWidget {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Confirmação de Check-Out'),
-          content: const Text('Você deseja finalizar o check-out?'),
+          title: const Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Text(
+                  'Confirmação de',
+                  style: TextStyle(color: Colors.black),
+                ),
+              ),
+              Center(
+                child: Text(
+                  'Check-Out',
+                  style: TextStyle(color: Colors.black),
+                ),
+              ),
+            ],
+          ),
+          content: const Text(
+            'Você deseja finalizar o check-out?',
+            style: TextStyle(color: Colors.black),
+          ),
+          backgroundColor: Colors.white.withOpacity(0.9),
           actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Fechar o diálogo
-              },
-              child: const Text('Cancelar'),
-            ),
-            TextButton(
-              onPressed: () {
-                // Lógica de finalização do check-out
-                Navigator.of(context).pop(); // Fechar o diálogo
-                _showSuccessDialog(context);
-              },
-              child: const Text('Confirmar'),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); 
+                  },
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.red, 
+                  ),
+                  child: const Text('Cancelar'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); 
+                    _showSuccessDialog(context);
+                  },
+                  style: TextButton.styleFrom(
+                    foregroundColor:
+                        const Color(0xFF0096c7), 
+                  ),
+                  child: const Text('Confirmar'),
+                ),
+              ],
             ),
           ],
         );
@@ -165,15 +269,29 @@ class CheckOutPage extends StatelessWidget {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Sucesso!'),
-          content: const Text('Check-out realizado com sucesso!'),
+          title: Center(
+            child: const Text(
+              'Sucesso!',
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
+          content: const Text(
+            'Check-out realizado com sucesso!',
+            style: TextStyle(color: Colors.black),
+          ),
+          backgroundColor: Colors.white.withOpacity(0.9),
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Fechar o diálogo
-                Navigator.of(context).pop(); // Voltar para a tela anterior
+                Navigator.of(context).pop();
+                Navigator.pushNamed(context, '/payment');
               },
-              child: const Text('OK'),
+              style: TextButton.styleFrom(
+                foregroundColor: const Color(0xFF0096c7),
+              ),
+              child: Center(
+                child: const Text('Realizar o pagamento'),
+              ),
             ),
           ],
         );

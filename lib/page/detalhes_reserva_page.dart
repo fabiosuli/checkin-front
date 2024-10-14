@@ -1,21 +1,19 @@
 import 'package:flutter/material.dart';
 
-class DetalhesReservaPage extends StatefulWidget {
+class DetalhesReservaPage extends StatelessWidget {
   const DetalhesReservaPage({super.key});
 
   @override
-  State<DetalhesReservaPage> createState() => _DetalhesReservaPageState();
-}
-
-class _DetalhesReservaPageState extends State<DetalhesReservaPage> {
-  @override
   Widget build(BuildContext context) {
-    final String nomeHospede = 'João da Silva';
+    final args =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    final String nomeHospede = args['nome'];
+    final String numeroReserva = args['reservaNumber'];
+
     final String documento = 'CPF: 123.456.789-00';
     final String quarto = '101 - Deluxe';
     final String dataCheckIn = '10/10/2024';
     final String dataCheckOut = '15/10/2024';
-    final String numeroReserva = 'AB123456';
     final double valorDiaria = 200.00;
     final double total = valorDiaria * 5;
     final String cafeDaManha = 'Incluído';
@@ -96,7 +94,10 @@ class _DetalhesReservaPageState extends State<DetalhesReservaPage> {
                     Center(
                       child: ElevatedButton.icon(
                         onPressed: () {
-                          Navigator.pushNamed(context, '/checkOut');
+                          Navigator.pushNamed(context, '/checkOut', arguments: {
+                            'reservationNumber': numeroReserva,
+                            'guestName': nomeHospede,
+                          });
                         },
                         icon: const Icon(Icons.exit_to_app),
                         label: const Text('Ir para Check-out'),
@@ -123,7 +124,7 @@ class _DetalhesReservaPageState extends State<DetalhesReservaPage> {
 
   Widget _buildListTile(IconData icon, String title, String subtitle) {
     return ListTile(
-      leading: Icon(icon, color: Color(0xFF0096c7)),
+      leading: Icon(icon, color: const Color(0xFF0096c7)),
       title: Text(title),
       subtitle: Text(
         subtitle,

@@ -3,6 +3,7 @@ import 'package:projeto_integrador4/page/checkout_page.dart';
 import 'package:projeto_integrador4/page/checkin_page.dart';
 import 'package:projeto_integrador4/page/detalhes_reserva_page.dart';
 import 'package:projeto_integrador4/page/home_page.dart';
+import 'package:projeto_integrador4/page/payment_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -28,8 +29,18 @@ class MyApp extends StatelessWidget {
             color: Colors.black,
           ),
           headlineMedium: TextStyle(
-            fontSize: 20,
+            fontSize: 21,
             fontWeight: FontWeight.w500,
+            color: Colors.black,
+          ),
+          bodyLarge: TextStyle(
+            fontSize: 19,
+            fontWeight: FontWeight.normal,
+            color: Colors.black,
+          ),
+          bodyMedium: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.normal,
             color: Colors.black,
           ),
         ),
@@ -51,6 +62,7 @@ class MyApp extends StatelessWidget {
         '/checkIn': (context) => const CheckInPage(),
         '/detalhesReserva': (context) => const DetalhesReservaPage(),
         '/checkOut': (context) => const CheckOutPage(),
+        '/payment': (context) => const PaymentPage(),
       },
     );
   }

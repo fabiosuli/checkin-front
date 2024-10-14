@@ -170,7 +170,7 @@ class _HomePageState extends State<HomePage> {
               message,
               style: const TextStyle(
                 fontSize: 18.0,
-                color: Colors.black54,
+                color: Colors.black,
               ),
             ),
             actions: [
@@ -180,8 +180,8 @@ class _HomePageState extends State<HomePage> {
                     Navigator.of(context).pop();
                   },
                   style: TextButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: const Color(0xFF00b4d8),
+                    foregroundColor: const Color(
+                        0xFF0096c7),
                     padding: const EdgeInsets.symmetric(
                         vertical: 12, horizontal: 20),
                     shape: RoundedRectangleBorder(
@@ -189,7 +189,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   child: const Text(
-                    'OK',
+                    'Entendi',
                     style: TextStyle(fontSize: 16.0),
                   ),
                 ),
