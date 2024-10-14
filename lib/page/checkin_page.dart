@@ -27,6 +27,14 @@ class _CheckInPageState extends State<CheckInPage> {
 
   @override
   Widget build(BuildContext context) {
+    final args =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    final String reservationNumber = args['reservationNumber'];
+    final String guestName = args['guestName'];
+
+    reservaController.text = reservationNumber;
+    nomeController.text = guestName;
+
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
@@ -89,12 +97,18 @@ class _CheckInPageState extends State<CheckInPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            'COLOCAR ALGUMA',
-                            style: Theme.of(context).textTheme.headlineLarge,
+                            'Bem-vindo(a) $guestName',
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineLarge!
+                                .copyWith(color: Colors.white),
                           ),
                           Text(
-                            'COISA AQUI',
-                            style: Theme.of(context).textTheme.headlineLarge,
+                            'Número da Reserva: $reservationNumber',
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineMedium!
+                                .copyWith(color: Colors.white),
                           ),
                         ],
                       ),
@@ -135,12 +149,14 @@ class _CheckInPageState extends State<CheckInPage> {
                                 FilteringTextInputFormatter.digitsOnly
                               ],
                               controller: reservaController,
+                              enabled: false,
                             ),
                             const SizedBox(height: 20.0),
                             CustomInputField(
                               label: 'Nome Completo',
                               width: screenWidth * 0.8,
                               controller: nomeController,
+                              enabled: false,
                             ),
                             const SizedBox(height: 20.0),
                             Row(

@@ -8,6 +8,7 @@ class CustomInputField extends StatelessWidget {
   final List<TextInputFormatter>? inputFormatters;
   final double fontSize;
   final TextEditingController? controller;
+  final bool enabled;
 
   const CustomInputField({
     super.key,
@@ -17,6 +18,7 @@ class CustomInputField extends StatelessWidget {
     this.inputFormatters,
     this.fontSize = 14.0,
     this.controller,
+    this.enabled = true,
   });
 
   @override
@@ -27,6 +29,7 @@ class CustomInputField extends StatelessWidget {
         controller: controller,
         keyboardType: keyboardType,
         inputFormatters: inputFormatters,
+        enabled: enabled,
         style: TextStyle(fontSize: fontSize),
         decoration: InputDecoration(
           labelText: label,
