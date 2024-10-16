@@ -176,7 +176,9 @@ class CheckOutPage extends StatelessWidget {
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 30.0, vertical: 15.0),
+                        horizontal: 30.0,
+                        vertical: 15.0,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
@@ -184,11 +186,11 @@ class CheckOutPage extends StatelessWidget {
                     onPressed: () {
                       _showConfirmationDialog(context);
                     },
-                    child: Row(
+                    child: const Row(
                       mainAxisSize: MainAxisSize.min,
-                      children: const [
+                      children: [
                         Icon(Icons.check_circle, size: 20),
-                        SizedBox(width: 8), 
+                        SizedBox(width: 8),
                         Text(
                           'Finalizar Check-Out',
                           style: TextStyle(fontSize: 16),
@@ -228,8 +230,9 @@ class CheckOutPage extends StatelessWidget {
             ],
           ),
           content: const Text(
-            'Você deseja finalizar o check-out?',
+            'Você deseja finalizar o\ncheck-out?',
             style: TextStyle(color: Colors.black),
+            textAlign: TextAlign.center,
           ),
           backgroundColor: Colors.white.withOpacity(0.9),
           actions: [
@@ -238,21 +241,20 @@ class CheckOutPage extends StatelessWidget {
               children: [
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pop(); 
+                    Navigator.of(context).pop();
                   },
                   style: TextButton.styleFrom(
-                    foregroundColor: Colors.red, 
+                    foregroundColor: Colors.red,
                   ),
                   child: const Text('Cancelar'),
                 ),
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pop(); 
+                    Navigator.of(context).pop();
                     _showSuccessDialog(context);
                   },
                   style: TextButton.styleFrom(
-                    foregroundColor:
-                        const Color(0xFF0096c7), 
+                    foregroundColor: const Color(0xFF0096c7),
                   ),
                   child: const Text('Confirmar'),
                 ),
@@ -269,15 +271,24 @@ class CheckOutPage extends StatelessWidget {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Center(
-            child: const Text(
+          title: const Center(
+            child: Text(
               'Sucesso!',
               style: TextStyle(color: Colors.black),
             ),
           ),
-          content: const Text(
-            'Check-out realizado com sucesso!',
-            style: TextStyle(color: Colors.black),
+          content: const Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Check-out realizado',
+                style: TextStyle(color: Colors.black),
+              ),
+              Text(
+                'com sucesso!',
+                style: TextStyle(color: Colors.black),
+              )
+            ],
           ),
           backgroundColor: Colors.white.withOpacity(0.9),
           actions: [
@@ -289,8 +300,8 @@ class CheckOutPage extends StatelessWidget {
               style: TextButton.styleFrom(
                 foregroundColor: const Color(0xFF0096c7),
               ),
-              child: Center(
-                child: const Text('Realizar o pagamento'),
+              child: const Center(
+                child: Text('Realizar o pagamento'),
               ),
             ),
           ],
