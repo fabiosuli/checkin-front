@@ -1,16 +1,14 @@
-# projeto_integrador4
+# Projeto Integrador 4 - PUC Campinas - Sistema de Check-In e Check-Out para Hotel - Front-End
 
-A new Flutter project.
+Este projeto consiste em um sistema de gestão de hotel que permite funcionalidades como check-in, check-out, visualização de informações de reserva, métodos de pagamento, entre outros.
 
-## Getting Started
+## Funcionalidades
 
-This project is a starting point for a Flutter application.
+- **Check-in**: Insira o número da reserva e veja automaticamente os detalhes do hóspede e quarto.
+- **Check-out**: Veja o consumo total do hóspede e selecione o método de pagamento.
+- **Pagamentos**: Suporte para múltiplos métodos de pagamento.
 
-A few resources to get you started if this is your first Flutter project:
+## Tecnologias Utilizadas
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- **Flutter**: Utilizado para desenvolvimento do frontend e das interfaces móveis.
+- **Dart**: Linguagem utilizada no desenvolvimento do Flutter.
