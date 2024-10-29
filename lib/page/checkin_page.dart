@@ -39,6 +39,7 @@ class _CheckInPageState extends State<CheckInPage> {
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(60),
         child: Container(
@@ -114,19 +115,18 @@ class _CheckInPageState extends State<CheckInPage> {
                       ),
                     ),
                   ),
-                  Container(
-                    width: double.infinity,
-                    height: screenHeight * 0.6,
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(45.0),
-                        topRight: Radius.circular(45.0),
+                  Expanded(
+                    child: Container(
+                      width: double.infinity,
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(45.0),
+                          topRight: Radius.circular(45.0),
+                        ),
                       ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 30.0),
                       child: SingleChildScrollView(
+                        padding: const EdgeInsets.symmetric(vertical: 30.0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [

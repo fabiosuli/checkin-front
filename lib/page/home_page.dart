@@ -39,7 +39,7 @@ class _HomePageState extends State<HomePage> {
         ),
         child: SafeArea(
           child: Center(
-            child: Padding(
+            child: SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
               child: Container(
                 decoration: BoxDecoration(
@@ -180,8 +180,7 @@ class _HomePageState extends State<HomePage> {
                     Navigator.of(context).pop();
                   },
                   style: TextButton.styleFrom(
-                    foregroundColor: const Color(
-                        0xFF0096c7),
+                    foregroundColor: const Color(0xFF0096c7),
                     padding: const EdgeInsets.symmetric(
                         vertical: 12, horizontal: 20),
                     shape: RoundedRectangleBorder(
