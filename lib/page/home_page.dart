@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:projeto_integrador4/api/api.dart';
 import 'package:projeto_integrador4/widget/custom_input_field.dart';
 import 'dart:ui';
 
@@ -90,6 +91,33 @@ class _HomePageState extends State<HomePage> {
                           height: 50.0,
                           child: ElevatedButton(
                             onPressed: () {
+                              // final apiReserv = Api();
+                              // apiReserv
+                              //     .consultReserv(_reservationController.text)
+                              //     .then((value) {
+                              //   if (value == true) {
+                              //     Navigator.pushNamed(
+                              //       context,
+                              //       '/checkIn',
+                              //       arguments: {
+                              //         'reservationNumber':
+                              //             _reservationController.text,
+                              //         'guestName': _guestNameController.text,
+                              //       },
+                              //     );
+                              //   } else {
+                              //     showDialog(
+                              //         context: context,
+                              //         builder: (context) {
+                              //           return Scaffold(
+                              //             body: const Center(
+                              //               child: Text("Reserva Invalida!"),
+                              //             ),
+                              //           );
+                              //         });
+                              //   }
+                              // });
+
                               if (_reservationController.text.isNotEmpty &&
                                   _guestNameController.text.isNotEmpty) {
                                 Navigator.pushNamed(

@@ -1,7 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:projeto_integrador4/api/api.dart';
+import 'package:projeto_integrador4/api/results_reserve.dart';
 
-class DetalhesReservaPage extends StatelessWidget {
-  const DetalhesReservaPage({super.key});
+class DetalhesReservaPage extends StatefulWidget {
+  final String? reserveNumber;
+  const DetalhesReservaPage({super.key, this.reserveNumber});
+
+  @override
+  State<DetalhesReservaPage> createState() => _DetalhesReservaPageState();
+}
+
+class _DetalhesReservaPageState extends State<DetalhesReservaPage> {
+  Map<String, dynamic>? resulstReserv;
+  bool isLoading = true; // Controle de carregamento
+
+  @override
+  void initState() {
+    super.initState();
+    final apiDetails = Api();
+    apiDetails
+        .fetchReservationDetails(widget.reserveNumber ?? "")
+        .then((value) {
+      setState(() {
+        resulstReserv = value;
+        isLoading = false; // Dados carregados, desativa o carregamento
+      });
+    }).catchError((e) {
+      setState(() {
+        isLoading = false; // Em caso de erro, também desativa o carregamento
+      });
+      // Exibir mensagem de erro ou realizar algum outro tratamento
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Erro ao carregar os detalhes da reserva: $e'),
+        backgroundColor: Colors.red,
+      ));
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -9,11 +43,54 @@ class DetalhesReservaPage extends StatelessWidget {
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     final String nomeHospede = args['nome'];
     final String numeroReserva = args['reservaNumber'];
-
     final String documento = 'CPF: 123.456.789-00';
     final String quarto = '101 - Deluxe';
-    final String dataCheckIn = '10/10/2024';
-    final String dataCheckOut = '15/10/2024';
+
+    // Exibição de loading até que os dados estejam carregados
+    if (isLoading) {
+      return Scaffold(
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(60),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius:
+                  const BorderRadius.vertical(bottom: Radius.circular(30)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: AppBar(
+              backgroundColor: Colors.transparent,
+              centerTitle: true,
+              title: Text(
+                'Detalhes da Reserva',
+                style: Theme.of(context).textTheme.headlineLarge,
+              ),
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.black),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ),
+          ),
+        ),
+        body: const Center(
+          child: CircularProgressIndicator(), // Exibe um carregando
+        ),
+      );
+    }
+
+    // Verifique se os dados foram carregados antes de acessá-los
+    final String dataCheckIn =
+        resulstReserv?["checkInDate"] ?? "Data não disponível";
+    final String dataCheckOut =
+        resulstReserv?["checkOutDate"] ?? "Data não disponível";
     final double valorDiaria = 200.00;
     final double total = valorDiaria * 5;
     final String cafeDaManha = 'Incluído';
