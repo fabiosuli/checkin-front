@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:projeto_integrador4/api/api.dart';
-import 'package:projeto_integrador4/api/results_reserve.dart';
 
 class DetalhesReservaPage extends StatefulWidget {
   final String? reserveNumber;

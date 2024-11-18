@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:projeto_integrador4/api/api.dart';
 import 'package:projeto_integrador4/widget/custom_input_field.dart';
+import 'package:projeto_integrador4/api/booking_service.dart';
 import 'dart:ui';
 
 class HomePage extends StatefulWidget {
@@ -14,6 +14,9 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final TextEditingController _reservationController = TextEditingController();
   final TextEditingController _guestNameController = TextEditingController();
+  bool _isLoading = false;
+
+  final BookingService bookingService = BookingService();
 
   @override
   void dispose() {
@@ -90,50 +93,40 @@ class _HomePageState extends State<HomePage> {
                           width: screenWidth * 0.35,
                           height: 50.0,
                           child: ElevatedButton(
-                            onPressed: () {
-                              // final apiReserv = Api();
-                              // apiReserv
-                              //     .consultReserv(_reservationController.text)
-                              //     .then((value) {
-                              //   if (value == true) {
-                              //     Navigator.pushNamed(
-                              //       context,
-                              //       '/checkIn',
-                              //       arguments: {
-                              //         'reservationNumber':
-                              //             _reservationController.text,
-                              //         'guestName': _guestNameController.text,
-                              //       },
-                              //     );
-                              //   } else {
-                              //     showDialog(
-                              //         context: context,
-                              //         builder: (context) {
-                              //           return Scaffold(
-                              //             body: const Center(
-                              //               child: Text("Reserva Invalida!"),
-                              //             ),
-                              //           );
-                              //         });
-                              //   }
-                              // });
+                            onPressed: _isLoading
+                                ? null
+                                : () async {
+                                    setState(() {
+                                      _isLoading = true;
+                                    });
 
-                              if (_reservationController.text.isNotEmpty &&
-                                  _guestNameController.text.isNotEmpty) {
-                                Navigator.pushNamed(
-                                  context,
-                                  '/checkIn',
-                                  arguments: {
-                                    'reservationNumber':
-                                        _reservationController.text,
-                                    'guestName': _guestNameController.text,
+                                    try {
+                                      final reservation = _reservationController.text;
+                                      final response = await bookingService.fetchBooking(reservation);
+
+                                      if (response != null) {
+                                        Navigator.pushNamed(
+                                          context,
+                                          '/checkIn',
+                                          arguments: {
+                                            'reservationNumber':
+                                                response['reservationNumber'],
+                                            'guestName': response['guestName'],
+                                          },
+                                        );
+                                      } else {
+                                        _showErrorDialog(
+                                            context, 'Reserva não encontrada.');
+                                      }
+                                    } catch (e) {
+                                      _showErrorDialog(context,
+                                          'Erro ao buscar reserva: $e');
+                                    } finally {
+                                      setState(() {
+                                        _isLoading = false;
+                                      });
+                                    }
                                   },
-                                );
-                              } else {
-                                _showErrorDialog(context,
-                                    'Por favor, preencha todos os campos.');
-                              }
-                            },
                             child: const Text('Check-In'),
                           ),
                         ),
@@ -141,23 +134,27 @@ class _HomePageState extends State<HomePage> {
                           width: screenWidth * 0.35,
                           height: 50.0,
                           child: ElevatedButton(
-                            onPressed: () {
-                              if (_reservationController.text.isNotEmpty &&
-                                  _guestNameController.text.isNotEmpty) {
-                                Navigator.pushNamed(
-                                  context,
-                                  '/checkOut',
-                                  arguments: {
-                                    'reservationNumber':
-                                        _reservationController.text,
-                                    'guestName': _guestNameController.text,
+                            onPressed: _isLoading
+                                ? null
+                                : () {
+                                    if (_reservationController
+                                            .text.isNotEmpty &&
+                                        _guestNameController.text.isNotEmpty) {
+                                      Navigator.pushNamed(
+                                        context,
+                                        '/checkOut',
+                                        arguments: {
+                                          'reservationNumber':
+                                              _reservationController.text,
+                                          'guestName':
+                                              _guestNameController.text,
+                                        },
+                                      );
+                                    } else {
+                                      _showErrorDialog(context,
+                                          'Por favor, preencha todos os campos.');
+                                    }
                                   },
-                                );
-                              } else {
-                                _showErrorDialog(context,
-                                    'Por favor, preencha todos os campos.');
-                              }
-                            },
                             child: const Text('Check-Out'),
                           ),
                         ),
