@@ -1,7 +1,8 @@
+// home_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:projeto_integrador4/widget/custom_input_field.dart';
-import 'package:projeto_integrador4/api/booking_service.dart';
+import 'package:projeto_integrador4/api/api_service.dart';
 import 'dart:ui';
 
 class HomePage extends StatefulWidget {
@@ -16,7 +17,7 @@ class _HomePageState extends State<HomePage> {
   final TextEditingController _guestNameController = TextEditingController();
   bool _isLoading = false;
 
-  final BookingService bookingService = BookingService();
+  final ApiService apiService = ApiService();
 
   @override
   void dispose() {
@@ -96,31 +97,46 @@ class _HomePageState extends State<HomePage> {
                             onPressed: _isLoading
                                 ? null
                                 : () async {
+                                    final reservation =
+                                        _reservationController.text.trim();
+                                    final guestName =
+                                        _guestNameController.text.trim();
+
+                                    if (reservation.isEmpty ||
+                                        guestName.isEmpty) {
+                                      _showErrorDialog(
+                                          context, 'Preencha todos os campos.');
+                                      return;
+                                    }
+
                                     setState(() {
                                       _isLoading = true;
                                     });
 
                                     try {
-                                      final reservation = _reservationController.text;
-                                      final response = await bookingService.fetchBooking(reservation);
+                                      final response =
+                                          await apiService.validateBooking(
+                                              reservation, guestName);
 
-                                      if (response != null) {
+                                      if (response != null &&
+                                          response['status'] == 'valid') {
                                         Navigator.pushNamed(
                                           context,
                                           '/checkIn',
                                           arguments: {
-                                            'reservationNumber':
-                                                response['reservationNumber'],
-                                            'guestName': response['guestName'],
+                                            'reservationNumber': reservation,
+                                            'guestName': guestName,
                                           },
                                         );
                                       } else {
                                         _showErrorDialog(
-                                            context, 'Reserva não encontrada.');
+                                            context,
+                                            response?['message'] ??
+                                                'Reserva não encontrada.');
                                       }
                                     } catch (e) {
                                       _showErrorDialog(context,
-                                          'Erro ao buscar reserva: $e');
+                                          'Erro ao validar reserva: $e');
                                     } finally {
                                       setState(() {
                                         _isLoading = false;
@@ -137,17 +153,19 @@ class _HomePageState extends State<HomePage> {
                             onPressed: _isLoading
                                 ? null
                                 : () {
-                                    if (_reservationController
-                                            .text.isNotEmpty &&
-                                        _guestNameController.text.isNotEmpty) {
+                                    final reservation =
+                                        _reservationController.text.trim();
+                                    final guestName =
+                                        _guestNameController.text.trim();
+
+                                    if (reservation.isNotEmpty &&
+                                        guestName.isNotEmpty) {
                                       Navigator.pushNamed(
                                         context,
                                         '/checkOut',
                                         arguments: {
-                                          'reservationNumber':
-                                              _reservationController.text,
-                                          'guestName':
-                                              _guestNameController.text,
+                                          'reservationNumber': reservation,
+                                          'guestName': guestName,
                                         },
                                       );
                                     } else {

@@ -1,33 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:projeto_integrador4/api/api_service.dart';
 import 'package:projeto_integrador4/page/checkout_page.dart';
 import 'package:projeto_integrador4/page/checkin_page.dart';
 import 'package:projeto_integrador4/page/detalhes_reserva_page.dart';
 import 'package:projeto_integrador4/page/home_page.dart';
 import 'package:projeto_integrador4/page/payment_page.dart';
-import 'package:projeto_integrador4/api/booking_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await _checkConnection();
-  runApp(const MyApp());
-}
+  final apiService = ApiService();
+  final isConnected = await apiService.checkBackendConnection();
 
-// Verificar conexão com o backend
-Future<void> _checkConnection() async {
-  final bookingService = BookingService();
-  final isConnected = await bookingService.checkBackendConnection();
-  if (isConnected) {
-    print("Conexão com o backend estabelecida com sucesso!");
-  } else {
-    print("Falha ao conectar com o backend.");
-  }
+  runApp(MyApp(isConnected: isConnected));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool isConnected;
+
+  const MyApp({super.key, required this.isConnected});
 
   @override
   Widget build(BuildContext context) {
+    debugPrint("Backend está conectado? $isConnected");
+
     return MaterialApp(
       theme: ThemeData(
         scaffoldBackgroundColor: const Color(0xFF00b4d8),

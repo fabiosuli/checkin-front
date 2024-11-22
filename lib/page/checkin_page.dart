@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:projeto_integrador4/api/api_service.dart';
 import 'package:projeto_integrador4/widget/custom_input_field.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 class CheckInPage extends StatefulWidget {
   const CheckInPage({super.key});
@@ -24,17 +23,26 @@ class _CheckInPageState extends State<CheckInPage> {
     setState(() {
       selectedOption = value;
       label = value == 'CPF' ? 'Número do CPF' : 'Número do Passaporte';
-      errorMessage = null;  // Limpar mensagem de erro ao mudar a opção
+      errorMessage = null;
     });
   }
 
-  // Função para enviar os dados para o backend e validar
+  // Função de validação do documento
+  bool validarDocumento(String tipo, String documento) {
+    if (tipo == 'CPF') {
+      return documento.length == 11; // CPF deve ter 11 números
+    } else if (tipo == 'Passaporte') {
+      return documento.length >= 6; // Passaporte deve ter no mínimo 6 números
+    }
+    return false;
+  }
+
   Future<void> _handleCheckIn() async {
     String documento = documentoController.text.trim();
     String reservaNumber = reservaController.text.trim();
     String nome = nomeController.text.trim();
 
-    // Verifica se o campo de CPF ou Passaporte está vazio
+    // Verifica se os campos estão preenchidos
     if (documento.isEmpty || reservaNumber.isEmpty || nome.isEmpty) {
       setState(() {
         errorMessage = 'Por favor, preencha todos os campos.';
@@ -42,35 +50,25 @@ class _CheckInPageState extends State<CheckInPage> {
       return;
     }
 
-    // Preparando o corpo da requisição
-    Map<String, dynamic> data = {
-      'reservaNumber': reservaNumber,
-      'nome': nome,
-      'documento': documento,
-      'documentoTipo': selectedOption, // CPF ou Passaporte
-    };
+    // Validação do documento
+    if (!validarDocumento(selectedOption!, documento)) {
+      setState(() {
+        errorMessage = 'Número do $selectedOption inválido.';
+      });
+      return;
+    }
 
-    // Enviando a requisição para o backend
-    final response = await http.post(
-      Uri.parse('http://<seu-backend>/api/validarCheckIn'), // Coloque o endpoint correto do seu backend
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: json.encode(data),
-    );
+    // Chamada à API
+    final ApiService apiService = ApiService();
+    final success = await apiService.sendCheckIn(
+        reservaNumber, nome, selectedOption!, documento);
 
-    if (response.statusCode == 200) {
-      // Se a resposta for bem-sucedida, redireciona para a próxima tela
-      Navigator.pushNamed(
-        context,
-        '/detalhesReserva',
-        arguments: {
-          'reservaNumber': reservaNumber,
-          'nome': nome,
-        },
-      );
+    if (success) {
+      Navigator.pushNamed(context, '/detalhesReserva', arguments: {
+        'reservaNumber': reservaNumber,
+        'nome': nome,
+      });
     } else {
-      // Caso contrário, exibe a mensagem de erro
       setState(() {
         errorMessage = 'Erro ao validar os dados. Por favor, tente novamente.';
       });
@@ -79,7 +77,8 @@ class _CheckInPageState extends State<CheckInPage> {
 
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    final args =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     final String reservationNumber = args['reservationNumber'];
     final String guestName = args['guestName'];
 
@@ -153,14 +152,14 @@ class _CheckInPageState extends State<CheckInPage> {
                             style: Theme.of(context)
                                 .textTheme
                                 .headlineLarge!
-                                .copyWith(color: Colors.white),
+                                .copyWith(color: Colors.black),
                           ),
                           Text(
                             'Número da Reserva: $reservationNumber',
                             style: Theme.of(context)
                                 .textTheme
                                 .headlineMedium!
-                                .copyWith(color: Colors.white),
+                                .copyWith(color: Colors.black),
                           ),
                         ],
                       ),
@@ -244,7 +243,8 @@ class _CheckInPageState extends State<CheckInPage> {
                               const SizedBox(height: 10.0),
                               Text(
                                 errorMessage!,
-                                style: TextStyle(color: Colors.red, fontSize: 16),
+                                style: const TextStyle(
+                                    color: Colors.red, fontSize: 16),
                               ),
                             ],
                             const SizedBox(height: 20.0),
