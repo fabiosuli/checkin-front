@@ -59,18 +59,30 @@ class _CheckInPageState extends State<CheckInPage> {
     }
 
     // Chamada à API
-    final ApiService apiService = ApiService();
-    final success = await apiService.sendCheckIn(
-        reservaNumber, nome, selectedOption!, documento);
+    try {
+      final ApiService apiService = ApiService();
+      final success = await apiService.sendCheckIn(
+        reservaNumber,
+        nome,
+        selectedOption!,
+        documento,
+      );
 
-    if (success) {
-      Navigator.pushNamed(context, '/detalhesReserva', arguments: {
-        'reservaNumber': reservaNumber,
-        'nome': nome,
-      });
-    } else {
+      if (success) {
+        Navigator.pushNamed(context, '/detalhesReserva', arguments: {
+          'reservaNumber': reservaController.text,
+          'nome': nomeController.text,
+        });
+      } else {
+        setState(() {
+          errorMessage =
+              'Erro ao validar os dados. Por favor, tente novamente.';
+        });
+      }
+    } catch (e) {
       setState(() {
-        errorMessage = 'Erro ao validar os dados. Por favor, tente novamente.';
+        errorMessage =
+            'Ocorreu um erro ao realizar o check-in. Tente novamente.';
       });
     }
   }

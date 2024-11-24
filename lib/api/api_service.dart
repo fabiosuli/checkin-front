@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class ApiService {
@@ -8,11 +9,8 @@ class ApiService {
   /// Verifica se o backend está acessível.
   Future<bool> checkBackendConnection() async {
     try {
-      // Use uma rota existente, como '/api/checkin' ou '/api/bookings'
       final response =
           await http.get(Uri.parse('$baseUrl/api/test/connection'));
-
-      // Considera que a conexão é válida se o servidor responde com status 200
       return response.statusCode == 200;
     } catch (e) {
       print('Erro ao verificar conexão com o backend: $e');
@@ -25,7 +23,6 @@ class ApiService {
       String reservationNumber, String guestName) async {
     try {
       final url = Uri.parse('$baseUrl/api/bookings/validate');
-
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
@@ -34,9 +31,7 @@ class ApiService {
           'guestName': guestName,
         }),
       );
-
       if (response.statusCode == 200) {
-        print('Reserva encontrada');
         return json.decode(response.body);
       } else {
         print('Erro ao validar reserva: ${response.body}');
@@ -49,31 +44,60 @@ class ApiService {
   }
 
   /// Envia um pedido de check-in para o backend
-  Future<bool> sendCheckIn(String reservationNumber, String guestName,
-      String documentType, String documentNumber) async {
+  Future<bool> sendCheckIn(String reservaNumber, String nome,
+      String tipoDocumento, String numeroDocumento) async {
     try {
       final url = Uri.parse('$baseUrl/api/bookings/checkin');
-
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'reservationNumber': reservationNumber,
-          'guestName': guestName,
-          'documentType': documentType,
-          'documentNumber': documentNumber,
+        body: jsonEncode({
+          'reservationNumber': reservaNumber,
+          'guestName': nome,
+          'documentType': tipoDocumento,
+          'documentNumber': numeroDocumento,
         }),
       );
+      return response.statusCode == 200;
+    } catch (e) {
+      debugPrint('Erro ao se conectar com a API: $e');
+      return false;
+    }
+  }
 
+  /// Busca os detalhes da reserva
+  Future<Map<String, dynamic>?> fetchBookingDetails(
+      String reserveNumber) async {
+    final url = Uri.parse('$baseUrl/api/bookings/details/$reserveNumber');
+    try {
+      final response = await http.get(url);
       if (response.statusCode == 200) {
-        return true;
+        return json.decode(response.body);
       } else {
-        print('Erro ao fazer o check-in: ${response.body}');
-        return false;
+        throw Exception('Erro ao carregar dados');
       }
     } catch (e) {
-      print('Erro ao fazer o check-in: $e');
-      return false;
+      print('Erro: $e');
+      throw Exception('Falha ao se conectar ao servidor: $e');
+    }
+  }
+
+  /// Refatoração para buscar as despesas utilizando `fetchExpenseSummary`
+  Future<ExpenseSummary> fetchExpenseSummary(String reservationNumber) async {
+    final url = Uri.parse('$baseUrl/expenses/$reservationNumber');
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        var data = json.decode(response.body);
+        List<Expense> expenses =
+            (data['expenses'] as List).map((e) => Expense.fromJson(e)).toList();
+        double total = data['total'];
+        return ExpenseSummary(expenses: expenses, total: total);
+      } else {
+        throw Exception('Falha ao carregar resumo de despesas');
+      }
+    } catch (e) {
+      throw Exception('Erro ao conectar com o backend: $e');
     }
   }
 
@@ -90,14 +114,33 @@ class ApiService {
           'guestName': guestName,
         }),
       );
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        return response;
-      } else {
-        print('Erro ao enviar o checkout: ${response.body}');
-      }
+      return response.statusCode == 200 || response.statusCode == 201
+          ? response
+          : null;
     } catch (e) {
       print('Erro ao enviar o checkout: $e');
+      return null;
     }
-    return null;
   }
+}
+
+class Expense {
+  final String description;
+  final double amount;
+
+  Expense({required this.description, required this.amount});
+
+  factory Expense.fromJson(Map<String, dynamic> json) {
+    return Expense(
+      description: json['description'],
+      amount: json['amount'],
+    );
+  }
+}
+
+class ExpenseSummary {
+  final List<Expense> expenses;
+  final double total;
+
+  ExpenseSummary({required this.expenses, required this.total});
 }

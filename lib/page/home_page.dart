@@ -1,4 +1,3 @@
-// home_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:projeto_integrador4/widget/custom_input_field.dart';
@@ -94,86 +93,26 @@ class _HomePageState extends State<HomePage> {
                           width: screenWidth * 0.35,
                           height: 50.0,
                           child: ElevatedButton(
-                            onPressed: _isLoading
-                                ? null
-                                : () async {
-                                    final reservation =
-                                        _reservationController.text.trim();
-                                    final guestName =
-                                        _guestNameController.text.trim();
-
-                                    if (reservation.isEmpty ||
-                                        guestName.isEmpty) {
-                                      _showErrorDialog(
-                                          context, 'Preencha todos os campos.');
-                                      return;
-                                    }
-
-                                    setState(() {
-                                      _isLoading = true;
-                                    });
-
-                                    try {
-                                      final response =
-                                          await apiService.validateBooking(
-                                              reservation, guestName);
-
-                                      if (response != null &&
-                                          response['status'] == 'valid') {
-                                        Navigator.pushNamed(
-                                          context,
-                                          '/checkIn',
-                                          arguments: {
-                                            'reservationNumber': reservation,
-                                            'guestName': guestName,
-                                          },
-                                        );
-                                      } else {
-                                        _showErrorDialog(
-                                            context,
-                                            response?['message'] ??
-                                                'Reserva não encontrada.');
-                                      }
-                                    } catch (e) {
-                                      _showErrorDialog(context,
-                                          'Erro ao validar reserva: $e');
-                                    } finally {
-                                      setState(() {
-                                        _isLoading = false;
-                                      });
-                                    }
-                                  },
-                            child: const Text('Check-In'),
+                            onPressed: _isLoading ? null : _handleCheckIn,
+                            child: _isLoading
+                                ? const CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white),
+                                  )
+                                : const Text('Check-In'),
                           ),
                         ),
                         SizedBox(
                           width: screenWidth * 0.35,
                           height: 50.0,
                           child: ElevatedButton(
-                            onPressed: _isLoading
-                                ? null
-                                : () {
-                                    final reservation =
-                                        _reservationController.text.trim();
-                                    final guestName =
-                                        _guestNameController.text.trim();
-
-                                    if (reservation.isNotEmpty &&
-                                        guestName.isNotEmpty) {
-                                      Navigator.pushNamed(
-                                        context,
-                                        '/checkOut',
-                                        arguments: {
-                                          'reservationNumber': reservation,
-                                          'guestName': guestName,
-                                        },
-                                      );
-                                    } else {
-                                      _showErrorDialog(context,
-                                          'Por favor, preencha todos os campos.');
-                                    }
-                                  },
-                            child: const Text('Check-Out'),
+                            onPressed: _isLoading ? null : _handleCheckOut,
+                            child: _isLoading
+                                ? const CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white),
+                                  )
+                                : const Text('Check-Out'),
                           ),
                         ),
                       ],
@@ -186,6 +125,52 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  Future<void> _handleCheckIn() async {
+    await _handleBookingAction('/checkIn');
+  }
+
+  Future<void> _handleCheckOut() async {
+    await _handleBookingAction('/checkOut');
+  }
+
+  Future<void> _handleBookingAction(String route) async {
+    final reservation = _reservationController.text.trim();
+    final guestName = _guestNameController.text.trim();
+
+    if (reservation.isEmpty || guestName.isEmpty) {
+      _showErrorDialog(context, 'Preencha todos os campos.');
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final response = await apiService.validateBooking(reservation, guestName);
+
+      if (response != null && response['status'] == 'valid') {
+        Navigator.pushNamed(
+          context,
+          route,
+          arguments: {
+            'reservationNumber': reservation,
+            'guestName': guestName,
+          },
+        );
+      } else {
+        _showErrorDialog(
+            context, response?['message'] ?? 'Reserva não encontrada.');
+      }
+    } catch (e) {
+      _showErrorDialog(context, 'Erro ao validar reserva. Tente novamente.');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   void _showErrorDialog(BuildContext context, String message) {
