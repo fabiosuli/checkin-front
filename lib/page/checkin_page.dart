@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:projeto_integrador4/api/api_service.dart';
 import 'package:projeto_integrador4/widget/custom_input_field.dart';
+import 'package:projeto_integrador4/page/detalhes_reserva_page.dart';
 
 class CheckInPage extends StatefulWidget {
   const CheckInPage({super.key});
@@ -69,10 +70,15 @@ class _CheckInPageState extends State<CheckInPage> {
       );
 
       if (success) {
-        Navigator.pushNamed(context, '/detalhesReserva', arguments: {
-          'reservaNumber': reservaController.text,
-          'nome': nomeController.text,
-        });
+        // Navegação para a tela de detalhes da reserva
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DetalhesReservaPage(
+              reserveNumber: reservaController.text,
+            ),
+          ),
+        );
       } else {
         setState(() {
           errorMessage =
@@ -89,11 +95,13 @@ class _CheckInPageState extends State<CheckInPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Captura os argumentos passados ao navegar para a tela de check-in
     final args =
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     final String reservationNumber = args['reservationNumber'];
     final String guestName = args['guestName'];
 
+    // Preenche os campos com os dados da reserva
     reservaController.text = reservationNumber;
     nomeController.text = guestName;
 

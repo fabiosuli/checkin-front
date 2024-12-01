@@ -72,6 +72,7 @@ class ApiService {
     try {
       final response = await http.get(url);
       if (response.statusCode == 200) {
+        print("resonse ${response.body}");
         return json.decode(response.body);
       } else {
         throw Exception('Erro ao carregar dados');
@@ -89,6 +90,7 @@ class ApiService {
       final response = await http.get(url);
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
+        // O campo 'expenses' já foi filtrado sem o 'id' no modelo Expense
         List<Expense> expenses =
             (data['expenses'] as List).map((e) => Expense.fromJson(e)).toList();
         double total = data['total'];

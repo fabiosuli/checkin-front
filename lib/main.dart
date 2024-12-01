@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:projeto_integrador4/api/api_service.dart';
 import 'package:projeto_integrador4/page/checkout_page.dart';
 import 'package:projeto_integrador4/page/checkin_page.dart';
-import 'package:projeto_integrador4/page/detalhes_reserva_page.dart';
 import 'package:projeto_integrador4/page/home_page.dart';
 import 'package:projeto_integrador4/page/payment_page.dart';
 
@@ -69,7 +68,6 @@ class MyApp extends StatelessWidget {
       routes: {
         '/home': (context) => const HomePage(),
         '/checkIn': (context) => const CheckInPage(),
-        '/detalhesReserva': (context) => const DetalhesReservaPage(),
         '/checkOut': (context) => const CheckOutPage(),
         '/payment': (context) => const PaymentPage(),
       },

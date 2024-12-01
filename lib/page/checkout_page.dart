@@ -53,7 +53,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
 
   Future<void> _fetchExpense() async {
     final String apiUrl =
-        'http://localhost:8080/api/bookings/reservationNumber/$reservationNumber/expenses';
+        'http://localhost:8080/api/bookings/$reservationNumber/expenses';
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
