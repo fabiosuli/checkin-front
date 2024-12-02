@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:projeto_integrador4/cor/ipfixo.dart';
 
 class ApiService {
-  static const String baseUrl =
-      'http://localhost:8080'; // Atualize para o IP/URL do seu backend
+  static String baseUrl = Ipfixo().iplocal;
 
   /// Verifica se o backend está acessível.
   Future<bool> checkBackendConnection() async {
@@ -71,8 +71,9 @@ class ApiService {
     final url = Uri.parse('$baseUrl/api/bookings/details/$reserveNumber');
     try {
       final response = await http.get(url);
+      print("Response ${response.body}");
       if (response.statusCode == 200) {
-        print("resonse ${response.body}");
+        print("response ${response.body}");
         return json.decode(response.body);
       } else {
         throw Exception('Erro ao carregar dados');
