@@ -18,7 +18,7 @@ class ApiService {
     }
   }
 
-  /// Valida a reserva e o nome do hóspede
+  /// Valida o número da reserva e o nome do hóspede
   Future<Map<String, dynamic>?> validateBooking(
       String reservationNumber, String guestName) async {
     try {
@@ -84,14 +84,13 @@ class ApiService {
     }
   }
 
-  /// Refatoração para buscar as despesas utilizando `fetchExpenseSummary`
+  /// Busca as despesas de uma reserva
   Future<ExpenseSummary> fetchExpenseSummary(String reservationNumber) async {
     final url = Uri.parse('$baseUrl/expenses/$reservationNumber');
     try {
       final response = await http.get(url);
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
-        // O campo 'expenses' já foi filtrado sem o 'id' no modelo Expense
         List<Expense> expenses =
             (data['expenses'] as List).map((e) => Expense.fromJson(e)).toList();
         double total = data['total'];

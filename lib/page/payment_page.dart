@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:projeto_integrador4/page/home_page.dart';
 import 'package:flutter/services.dart';
+import 'package:projeto_integrador4/widget/custom_input_field.dart';
 
 class PaymentPage extends StatefulWidget {
   const PaymentPage({super.key});
@@ -14,7 +15,8 @@ class _PaymentPageState extends State<PaymentPage> {
   double _totalAmount = 250.0;
 
   final TextEditingController _cardNumberController = TextEditingController();
-  final TextEditingController _cardholderNameController = TextEditingController();
+  final TextEditingController _cardholderNameController =
+      TextEditingController();
   final TextEditingController _expiryDateController = TextEditingController();
   final TextEditingController _cvvController = TextEditingController();
 
@@ -23,48 +25,73 @@ class _PaymentPageState extends State<PaymentPage> {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(60),
-        child: AppBar(
-          backgroundColor: Colors.transparent,
-          centerTitle: true,
-          title: Text(
-            'Pagamento',
-            style: Theme.of(context).textTheme.headlineLarge?.copyWith(color: Colors.black),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius:
+                const BorderRadius.vertical(bottom: Radius.circular(30)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 10,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.black),
-            onPressed: () {
-              Navigator.pop(context);
-            },
+          child: AppBar(
+            backgroundColor: Colors.transparent,
+            centerTitle: true,
+            title: Text(
+              'Pagamento',
+              style: Theme.of(context).textTheme.headlineLarge,
+            ),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.black),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
           ),
-          elevation: 0,
         ),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(),
-              const SizedBox(height: 20),
-              _buildPaymentMethods(),
-              if (_selectedPaymentMethod == 'Cartão de Crédito') _buildCreditCardFields(),
-              const SizedBox(height: 40),
-              _buildTotalAmount(),
-              const SizedBox(height: 20),
-              _buildConfirmButton(),
-            ],
-          ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildHeader(),
+                    _buildPaymentMethods(),
+                    // Exibir campos de cartão tanto para 'Cartão de Crédito' quanto para 'Cartão de Débito'
+                    if (_selectedPaymentMethod == 'Cartão de Crédito' ||
+                        _selectedPaymentMethod == 'Cartão de Débito')
+                      _buildCardFields(),
+                    const SizedBox(height: 40),
+                  ],
+                ),
+              ),
+            ),
+            _buildFooter(), // Coloca o footer na parte inferior
+          ],
         ),
       ),
     );
   }
 
   Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      child: Text(
-        'Selecione o método de pagamento:',
-        style: Theme.of(context).textTheme.headlineMedium?.copyWith(color: Colors.black),
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Text(
+          'Selecione o método de pagamento:',
+          style: Theme.of(context)
+              .textTheme
+              .headlineMedium
+              ?.copyWith(color: Colors.black),
+        ),
       ),
     );
   }
@@ -109,46 +136,81 @@ class _PaymentPageState extends State<PaymentPage> {
     );
   }
 
-  Widget _buildCreditCardFields() {
+  Widget _buildCardFields() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 10.0),
-          _buildTextField('Número do Cartão:', _cardNumberController, TextInputType.number, 16, false),
+          CustomInputField(
+            label: 'Número do Cartão',
+            width: double.infinity,
+            keyboardType: TextInputType.number,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+              LengthLimitingTextInputFormatter(16),
+            ],
+            controller: _cardNumberController,
+          ),
           const SizedBox(height: 10.0),
-          _buildTextField('Nome do Titular:', _cardholderNameController, TextInputType.text, 0, false),
+          CustomInputField(
+            label: 'Nome do Titular',
+            width: double.infinity,
+            keyboardType: TextInputType.text,
+            controller: _cardholderNameController,
+          ),
           const SizedBox(height: 10.0),
-          _buildTextField('Data de Validade:', _expiryDateController, TextInputType.datetime, 0, false),
+          CustomInputField(
+            label: 'Data de Validade',
+            width: double.infinity,
+            keyboardType: TextInputType.datetime,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+              LengthLimitingTextInputFormatter(5),
+            ],
+            controller: _expiryDateController,
+          ),
           const SizedBox(height: 10.0),
-          _buildTextField('CVV:', _cvvController, TextInputType.number, 3, true),
+          CustomInputField(
+            label: 'CVV',
+            width: double.infinity,
+            keyboardType: TextInputType.number,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+              LengthLimitingTextInputFormatter(3),
+            ],
+            controller: _cvvController,
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller, TextInputType keyboardType, int maxLength, bool obscureText) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: Theme.of(context).textTheme.bodyMedium),
-        TextField(
-          controller: controller,
-          keyboardType: keyboardType,
-          obscureText: obscureText,
-          inputFormatters: maxLength > 0
-              ? [
-                  FilteringTextInputFormatter.digitsOnly,
-                  LengthLimitingTextInputFormatter(maxLength),
-                ]
-              : null,
-          decoration: InputDecoration(
-            hintText: label == 'Número do Cartão' ? '1234 5678 9101 1121' : label == 'Data de Validade' ? 'MM/AA' : '123',
-            border: OutlineInputBorder(),
+  Widget _buildFooter() {
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 10,
+            offset: Offset(0, -2),
           ),
-        ),
-      ],
+        ],
+      ),
+      child: Column(
+        children: [
+          // Total amount widget
+          _buildTotalAmount(),
+
+          const SizedBox(height: 10.0),
+
+          // Confirm button widget
+          _buildConfirmButton(),
+        ],
+      ),
     );
   }
 
@@ -160,11 +222,17 @@ class _PaymentPageState extends State<PaymentPage> {
         children: [
           Text(
             'Total: ',
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+            style: Theme.of(context)
+                .textTheme
+                .headlineMedium
+                ?.copyWith(fontWeight: FontWeight.bold),
           ),
           Text(
             'R\$ ${_totalAmount.toStringAsFixed(2)}',
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+            style: Theme.of(context)
+                .textTheme
+                .headlineMedium
+                ?.copyWith(fontWeight: FontWeight.bold),
           ),
         ],
       ),
@@ -177,7 +245,8 @@ class _PaymentPageState extends State<PaymentPage> {
       child: Center(
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 15.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 30.0, vertical: 15.0),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),
@@ -185,14 +254,16 @@ class _PaymentPageState extends State<PaymentPage> {
           onPressed: () {
             _confirmPayment(context);
           },
-          child: Row(
+          child: const Row(
             mainAxisSize: MainAxisSize.min,
-            children: const [
+            children: [
               Icon(Icons.payment, size: 20, color: Colors.white),
               SizedBox(width: 8),
               Text(
                 'Confirmar Pagamento',
-                style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 16,
+                ),
               ),
             ],
           ),
@@ -202,13 +273,15 @@ class _PaymentPageState extends State<PaymentPage> {
   }
 
   void _confirmPayment(BuildContext context) {
-    if (_selectedPaymentMethod == 'Cartão de Crédito') {
+    if (_selectedPaymentMethod == 'Cartão de Crédito' ||
+        _selectedPaymentMethod == 'Cartão de Débito') {
       if (_validateCard()) {
         _showConfirmationDialog();
       } else {
         _showErrorDialog('Por favor, verifique as informações do cartão.');
       }
-    } else if (_selectedPaymentMethod == 'Cartão de Débito' || _selectedPaymentMethod == 'Dinheiro' || _selectedPaymentMethod == 'PIX') {
+    } else if (_selectedPaymentMethod == 'Dinheiro' ||
+        _selectedPaymentMethod == 'PIX') {
       _showConfirmationDialog();
     }
   }
@@ -325,8 +398,8 @@ class _PaymentPageState extends State<PaymentPage> {
 
   bool _validateCard() {
     return _cardNumberController.text.isNotEmpty &&
-           _cardholderNameController.text.isNotEmpty &&
-           _expiryDateController.text.isNotEmpty &&
-           _cvvController.text.isNotEmpty;
+        _cardholderNameController.text.isNotEmpty &&
+        _expiryDateController.text.isNotEmpty &&
+        _cvvController.text.isNotEmpty;
   }
 }

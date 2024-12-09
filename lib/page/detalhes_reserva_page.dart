@@ -12,19 +12,17 @@ class DetalhesReservaPage extends StatefulWidget {
 
 class _DetalhesReservaPageState extends State<DetalhesReservaPage> {
   Map<String, dynamic>? data;
-  bool isLoading = true; // Controle de carregamento
-  String errorMessage = ''; // Para exibir mensagens de erro
+  bool isLoading = true;
+  String errorMessage = '';
 
-  // Instância do ApiService
   final ApiService _apiService = ApiService();
 
   @override
   void initState() {
     super.initState();
-    _fetchBookingDetails(); // Função para pegar os dados do backend
+    _fetchBookingDetails();
   }
 
-  // Função para buscar os detalhes da reserva do backend
   Future<void> _fetchBookingDetails() async {
     try {
       // Verifica se o número da reserva é válido
@@ -34,21 +32,18 @@ class _DetalhesReservaPageState extends State<DetalhesReservaPage> {
           widget.reserveNumber!,
         );
 
-        // Atualiza o estado com os detalhes
         setState(() {
           data = responseData;
           isLoading = false;
-          errorMessage = ''; // Limpa qualquer mensagem de erro
+          errorMessage = '';
         });
       } else {
-        // Atualiza o estado caso o número da reserva seja inválido
         setState(() {
           errorMessage = 'Número da reserva inválido.';
           isLoading = false;
         });
       }
     } catch (e) {
-      // Trata erros da requisição ou do serviço
       setState(() {
         errorMessage = 'Erro ao buscar detalhes da reserva: ${e.toString()}';
         isLoading = false;
@@ -67,7 +62,6 @@ class _DetalhesReservaPageState extends State<DetalhesReservaPage> {
       );
     }
 
-    // Exibe mensagem de erro caso ocorra algum problema
     if (errorMessage.isNotEmpty) {
       return Scaffold(
         appBar: _buildAppBar(),
@@ -83,22 +77,18 @@ class _DetalhesReservaPageState extends State<DetalhesReservaPage> {
 
     // Dados para exibição
     final String nomeHospede = data?["guestName"] ?? "Nome não disponível";
-    final String documento = data?["documentNumber"] ??
-        "Documento não disponível"; // Corrigido para documentNumber
+    final String documento =
+        data?["documentNumber"] ?? "Documento não disponível";
     final String tipoDocumento =
         data?["documentType"] ?? "Tipo de documento não informado";
-    final String quarto = data?["roomNumber"] ??
-        "Quarto não disponível"; // Corrigido para roomNumber
+    final String quarto = data?["roomNumber"] ?? "Quarto não disponível";
     final String dataCheckIn = data?["checkInDate"] ?? "Data não disponível";
     final String dataCheckOut = data?["checkOutDate"] ?? "Data não disponível";
 
     final double valorDiaria =
         double.tryParse(data!["dailyValue"].toString()) ?? 0.0;
     final int totalDias = (data?["totalDays"] ?? 0) as int;
-    print("valor da diaria ${valorDiaria}");
-    print("total de dias: ${totalDias}");
     final double totalDiarias = valorDiaria * totalDias;
-    print("valor total das diarias: ${totalDiarias}");
 
     final String cafeDaManha =
         (data?["breakfast"]?.toString().toLowerCase() == 'true')
@@ -109,76 +99,87 @@ class _DetalhesReservaPageState extends State<DetalhesReservaPage> {
 
     return Scaffold(
       appBar: _buildAppBar(),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0xFF00b4d8),
-              Color(0xFF90e0ef),
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: SingleChildScrollView(
-            child: Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+      body: Column(
+        children: [
+          Expanded(
+            child: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Color(0xFF00b4d8),
+                    Color(0xFF90e0ef),
+                  ],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildListTile(
-                        Icons.person, 'Nome do Hóspede', nomeHospede),
-                    _buildListTile(
-                        Icons.assignment, 'Tipo de Documento', tipoDocumento),
-                    _buildListTile(Icons.assignment, 'Documento', documento),
-                    _buildListTile(Icons.hotel, 'Quarto', quarto),
-                    _buildListTile(Icons.date_range, 'Check-in', dataCheckIn),
-                    _buildListTile(Icons.date_range, 'Check-out', dataCheckOut),
-                    _buildListTile(Icons.attach_money, 'Valor da Diária',
-                        'R\$ ${valorDiaria.toStringAsFixed(2)}'),
-                    _buildListTile(Icons.attach_money, 'Total das Diárias',
-                        'R\$ ${totalDiarias.toStringAsFixed(2)}'),
-                    _buildListTile(
-                        Icons.fastfood, 'Café da Manhã', cafeDaManha),
-                    _buildListTile(
-                        Icons.info, 'Política de Cancelamento', cancelamento),
-                    const SizedBox(height: 20),
-                    Center(
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.pushNamed(context, '/checkOut', arguments: {
-                            'reservationNumber': widget.reserveNumber,
-                            'guestName': nomeHospede,
-                          });
-                        },
-                        icon: const Icon(Icons.exit_to_app),
-                        label: const Text('Ir para Check-out'),
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 30, vertical: 15),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
+                child: SingleChildScrollView(
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildListTile(
+                              Icons.person, 'Nome do Hóspede', nomeHospede),
+                          _buildListTile(Icons.assignment, 'Tipo de Documento',
+                              tipoDocumento),
+                          _buildListTile(
+                              Icons.assignment, 'Documento', documento),
+                          _buildListTile(Icons.hotel, 'Quarto', quarto),
+                          _buildListTile(
+                              Icons.date_range, 'Check-in', dataCheckIn),
+                          _buildListTile(
+                              Icons.date_range, 'Check-out', dataCheckOut),
+                          _buildListTile(Icons.attach_money, 'Valor da Diária',
+                              'R\$ ${valorDiaria.toStringAsFixed(2)}'),
+                          _buildListTile(
+                              Icons.attach_money,
+                              'Total das Diárias',
+                              'R\$ ${totalDiarias.toStringAsFixed(2)}'),
+                          _buildListTile(
+                              Icons.fastfood, 'Café da Manhã', cafeDaManha),
+                          _buildListTile(Icons.info, 'Política de Cancelamento',
+                              cancelamento),
+                          const SizedBox(height: 20),
+                          Center(
+                            child: ElevatedButton.icon(
+                              onPressed: () {
+                                Navigator.pushNamed(context, '/checkOut',
+                                    arguments: {
+                                      'reservationNumber': widget.reserveNumber,
+                                      'guestName': nomeHospede,
+                                    });
+                              },
+                              icon: const Icon(Icons.exit_to_app),
+                              label: const Text('Ir para Check-out'),
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 30, vertical: 15),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
+                        ],
                       ),
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
 
-  // Função para criar o AppBar personalizado
   PreferredSizeWidget _buildAppBar() {
     return PreferredSize(
       preferredSize: const Size.fromHeight(60),
@@ -213,7 +214,6 @@ class _DetalhesReservaPageState extends State<DetalhesReservaPage> {
     );
   }
 
-  // Função para criar itens de exibição
   Widget _buildListTile(IconData icon, String title, String subtitle) {
     return ListTile(
       leading: Icon(icon, color: const Color(0xFF0096c7)),
